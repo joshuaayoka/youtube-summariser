@@ -1,6 +1,7 @@
 // Import useState and useEffect
 import { useState } from "react";
 import { Summary } from "./components/Summary";
+import "./App.css"
 
 export default function App() {
   const [url, setUrl] = useState("");
@@ -37,43 +38,57 @@ export default function App() {
   }
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <input
-          className="input-url"
-          placeholder="url"
-          onChange={handleChange}
-        />
-        <button className="submit-url" type="submit">Submit</button>
-      </form>
-
-      {videoDetails.title && (
-        <div>
-          <h2>Video Details:</h2>
-          <p>Title: {videoDetails.title}</p>
-          <p>Creator: {videoDetails.creator}</p>
+    <main>
+      <navbar>
+        <header>
+          <h1 className="app-heading">Summariser App</h1>
+        </header>
+      </navbar>
+      <div className="app">
+        <div className="url-entry">
+          <form 
+            onSubmit={handleSubmit} 
+            className="url-form"
+          >
+            <input
+              className="input-url"
+              placeholder="Enter URL"
+              onChange={handleChange}
+            />
+            <button className="submit-url" type="submit">Search</button>
+          </form>
         </div>
-      )}
+        <div className="info">
+          {videoDetails.title && (
+            <div id="info">
+              {/* <h2>Video Details:</h2> */}
+              <p className="video-title">Title: {videoDetails.title}</p>
+              <p>Creator: {videoDetails.creator}</p>
+            </div>
+          )}
 
-      {transcript && (
-        <div>
-          <h2>Transcript:</h2>
-          <p>{transcript}</p>
+          {/* {transcript && (
+            <div id="info">>
+              <h2>Transcript:</h2>
+              <p>{transcript}</p>
+            </div>
+          )} */}
+          {summary && <div id="info">
+            {summary && 
+              <Summary 
+                summary={summary}
+              />
+            }
+          </div>
+          }
+          {/* {summary && (
+            <div>
+              <h2>Summary:</h2>
+              <p>{summary}</p>
+            </div>
+          )} */}
         </div>
-      )}
-
-      {summary && 
-        <Summary 
-          summary={summary}
-        />
-      }
-
-      {/* {summary && (
-        <div>
-          <h2>Summary:</h2>
-          <p>{summary}</p>
-        </div>
-      )} */}
-    </div>
+      </div>
+    </main>
   );
 }

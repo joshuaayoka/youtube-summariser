@@ -1,6 +1,8 @@
 // Import useState and useEffect
 import { useState } from "react";
 import { Summary } from "./components/Summary";
+import { ListButton } from "./components/ListButton";
+import { Button } from "./components/Button";
 import "./App.css"
 
 export default function App() {
@@ -38,57 +40,62 @@ export default function App() {
   }
 
   return (
-    <main>
-      <navbar>
-        <header>
-          <h1 className="app-heading">Summariser App</h1>
-        </header>
-      </navbar>
-      <div className="app">
-        <div className="url-entry">
-          <form 
-            onSubmit={handleSubmit} 
-            className="url-form"
-          >
-            <input
-              className="input-url"
-              placeholder="Enter URL"
-              onChange={handleChange}
-            />
-            <button className="submit-url" type="submit">Search</button>
-          </form>
+    <div className="app-container">
+      <navbar className="nav">
+        <div className="nav-items">
+          <Button
+            text="Hello"
+          />
+          <ListButton />
         </div>
-        <div className="info">
-          {videoDetails.title && (
-            <div id="info">
-              {/* <h2>Video Details:</h2> */}
-              <p className="video-title">Title: {videoDetails.title}</p>
-              <p>Creator: {videoDetails.creator}</p>
-            </div>
-          )}
-
-          {/* {transcript && (
-            <div id="info">>
-              <h2>Transcript:</h2>
-              <p>{transcript}</p>
-            </div>
-          )} */}
-          {summary && <div id="info">
-            {summary && 
-              <Summary 
-                summary={summary}
+      </navbar>
+      <header className="header">
+        <h1 className="app-heading">
+          <span className="heading1">YT </span>
+          <span className="heading2">Summariser</span>
+        </h1>
+      </header>
+      <main>
+        <div className="app">
+          <div className="url-entry">
+            <form 
+              onSubmit={handleSubmit} 
+              className="url-form"
+            >
+              <input
+                className="input-url"
+                placeholder="Enter URL"
+                onChange={handleChange}
               />
+              <button className="submit-url" type="submit">Search</button>
+            </form>
+          </div>
+          <div className="info">
+            {videoDetails.title && (
+              <div id="info">
+                {/* <h2>Video Details:</h2> */}
+                <p className="video-title">Title: {videoDetails.title}</p>
+                <p>Creator: {videoDetails.creator}</p>
+              </div>
+            )}
+
+            {/* {transcript && (
+              <div id="info">>
+                <h2>Transcript:</h2>
+                <p>{transcript}</p>
+              </div>
+            )} */}
+            {summary && <div id="info">
+              {summary && 
+                <Summary 
+                  summary={summary}
+                />
+              }
+            </div>
             }
           </div>
-          }
-          {/* {summary && (
-            <div>
-              <h2>Summary:</h2>
-              <p>{summary}</p>
-            </div>
-          )} */}
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

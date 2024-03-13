@@ -1,0 +1,12 @@
+Summarise this transcript from a video. This should be the format:
+1. Subtitle
+Content
+
+2. Subtitle
+Content
+
+etc.
+
+Make sure to include numbering for each section.
+
+Here is the transcript:

@@ -1,4 +1,2 @@
-const a = "hello"
-const b = " world"
-const c = a.concat(b)
-console.log(c)
+let arr = []
+arr.length > 0 && console.log("Hello")

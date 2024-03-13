@@ -1,8 +1,7 @@
 import { useState, useId } from "react"
 
-export function Summary(props) {
-
-    const [summaryArray, setSummaryArray] = useState(props.summary)
+export default function Summary(props) {
+    const [summaryArray, setSummaryArray] = useState(props.summary.text)
 
     const id = useId()
     
@@ -17,8 +16,14 @@ export function Summary(props) {
 
     return (
         <div>
-            <h2>Summary</h2>
-            {summaryElements}
+            <div id="info">
+                <p className="video-title">Video: {props.summary.title}</p>
+                <p>Creator: {props.summary.creator}</p>
+            </div>
+            <div id="info">
+                <h2>Summary</h2>
+                {summaryElements}
+            </div>
         </div>
     )
 }

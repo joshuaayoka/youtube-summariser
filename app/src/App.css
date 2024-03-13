@@ -16,6 +16,7 @@ main {
     border: none;
     display: flex;
     align-items: center;
+    height: 70px;
 }
 
 .nav-items {
@@ -107,6 +108,22 @@ main {
 
 .listButton {
     padding: 10px;
+}
+
+aside {
+    background-color: aliceblue;
+    position: fixed;
+    width: 150px;
+    top: 70px;
+    bottom: 0;
+    left: 0px;
+    padding: 10px;
+    transform: translateX(-120%); 
+    transition: 0.15s ease transform;
+}
+
+aside.visible {
+    transform: translateX(0);
 }
 
 #info {

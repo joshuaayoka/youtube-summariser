@@ -1,7 +1,13 @@
 import "./Button.css"
 
-export function Button(props) {
+export default function Button(props) {
     return (
-        <button id="button">{props.text}</button>
+        <button 
+            id="button"
+            className={`${props.className}`}
+            onClick={props.handleClick}
+            >
+            {props.text}
+        </button>
     )
 }

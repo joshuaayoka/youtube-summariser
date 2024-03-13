@@ -1,15 +1,75 @@
 // Import useState and useEffect
-import { useState } from "react";
-import { Summary } from "./components/Summary";
-import { ListButton } from "./components/ListButton";
-import { Button } from "./components/Button";
-import "./App.css"
+import { useEffect, useState, useRef } from "react";
+import Summary from "./components/Summary";
+import Button from "./components/Button";
+import Sidebar from "./components/Sidebar";
+import "./App.css";
+import { nanoid } from "nanoid";
 
 export default function App() {
   const [url, setUrl] = useState("");
   const [transcript, setTranscript] = useState("");
-  const [videoDetails, setVideoDetails] = useState({ title: "", creator: "" });
-  const [summary, setSummary] = useState("")
+  const [summary, setSummary] = useState({
+     id: "",
+     title: "", 
+     text: "",
+     date: "",
+     time: ""
+  });
+  const [sidebarToggled, setSidebarToggled] = useState(false);
+  const [summaries, setSummaries] = useState(() => JSON.parse(localStorage.getItem("summaries")) || [])
+  const [currentSummaryId, setCurrentSummaryId] = useState(
+    (summaries[0] && summaries[0].id) || ""
+  )
+  
+  console.log("render")
+
+  // for clicking off sidebar
+  const sidebarRef = useRef(null);
+
+  useEffect(() => {
+    function handler(e) {
+      if (sidebarRef.current) {
+        if (
+          !e.target.classList.contains('sidebar') &&
+          !e.target.classList.contains('sidebar-toggle')){
+          setSidebarToggled(false)
+        }
+      }
+    }
+
+    document.addEventListener("click", handler);
+
+    return () => {
+      document.removeEventListener("click", handler)
+    }
+  })
+
+  // for saving to local storage
+
+  useEffect(() => {
+    localStorage.setItem("summaries", JSON.stringify(summaries))
+    console.log("saved")
+  }, [summaries])
+
+  // for obtaining from local storage
+
+  // useEffect(() => {
+  //   setSummaries(() => JSON.parse(localStorage.getItem("summaries")) || [])
+  // }, [])
+
+  function createSummary(videoDetails, summaryText) {
+    const newSummary = {
+      id: nanoid(),
+      title: videoDetails.title,
+      creator: videoDetails.title,
+      text: summaryText,
+      date: "",
+      time: ""
+    }
+    setSummary(newSummary)
+    setSummaries([newSummary, ...summaries])
+  }
 
   function handleChange(event) {
     const { value } = event.target;
@@ -18,7 +78,7 @@ export default function App() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    console.log(url);
+    console.log(url); 
     await sendURL();
   }
 
@@ -31,30 +91,49 @@ export default function App() {
 
       const data = await response.json();
       setTranscript(data.regularText);
-      setVideoDetails({ title: data.title, creator: data.creator });
-      setSummary(data.promptOutput)
+      createSummary({ title: data.title, creator: data.creator }, data.promptOutput)
     } catch (error) {
       console.error("Error sending URL:", error);
       // Handle error, e.g., display an error message to the user
     }
   }
 
+  function handleSidebarClick() {
+    sidebarToggled ? 
+    setSidebarToggled(false) :
+    setSidebarToggled(true)
+  }
+
+  // function getSummaryTitles() {
+  //   console.log(summaries)
+  //   const titles = summaries.map( summary => summary.title)
+  //   return titles
+  //   //console.log(titles)
+  // }
+
   return (
     <div className="app-container">
-      <navbar className="nav">
+      <nav className="nav">
         <div className="nav-items">
           <Button
-            text="Hello"
+            className="sidebar-toggle"
+            text="Prev"
+            handleClick={handleSidebarClick}
           />
-          <ListButton />
         </div>
-      </navbar>
+      </nav>
       <header className="header">
         <h1 className="app-heading">
           <span className="heading1">YT </span>
           <span className="heading2">Summariser</span>
         </h1>
       </header>
+      <Sidebar
+        sidebarRef={sidebarRef}
+        sidebarToggled={sidebarToggled}
+        // titles={getSummaryTitles()}
+        summaries={summaries}
+      />
       <main>
         <div className="app">
           <div className="url-entry">
@@ -71,27 +150,18 @@ export default function App() {
             </form>
           </div>
           <div className="info">
-            {videoDetails.title && (
+            {/* {summary.title && (
               <div id="info">
-                {/* <h2>Video Details:</h2> */}
-                <p className="video-title">Title: {videoDetails.title}</p>
-                <p>Creator: {videoDetails.creator}</p>
-              </div>
-            )}
-
-            {/* {transcript && (
-              <div id="info">>
-                <h2>Transcript:</h2>
-                <p>{transcript}</p>
+                
               </div>
             )} */}
-            {summary && <div id="info">
-              {summary && 
+
+            
+              {summary.text && 
                 <Summary 
                   summary={summary}
                 />
-              }
-            </div>
+            
             }
           </div>
         </div>

@@ -1,19 +1,22 @@
 export default function Sidebar(props) {
-    console.log(props.titles);
   
     // Check if props.summaries is not empty
-    const hasSummaries = props.summaries && props.summaries.length > 0;
+    const hasSummaries = props.summaries && props.summaries.length > 0
   
     // If not empty, create buttons
     const buttons = hasSummaries
-        ? props.summaries.map((summary) => (
-            <button 
-                key={`btn${summary.id}`}
-                >
-                    {summary.title}
-            </button>
-        ))
-        : null;
+        ? props.summaries.map((summary) => {
+            const id = summary.id
+            return (
+                <button 
+                    key={`btn${id}`}
+                    onClick={() => props.setCurrentSummaryId(id)}
+                    >
+                        {summary.title}
+                </button>
+            )
+            })
+        : null
   
     return (
         <aside

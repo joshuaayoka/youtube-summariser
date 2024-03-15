@@ -21,8 +21,8 @@ export default function App() {
   const [currentSummaryId, setCurrentSummaryId] = useState(
     (summaries[0] && summaries[0].id) || ""
   )
-  
-  console.log("render")
+  console.log(currentSummaryId)
+
 
   // for clicking off sidebar
   const sidebarRef = useRef(null);
@@ -49,25 +49,27 @@ export default function App() {
 
   useEffect(() => {
     localStorage.setItem("summaries", JSON.stringify(summaries))
-    console.log("saved")
   }, [summaries])
 
-  // for obtaining from local storage
+  // for changing summary
 
-  // useEffect(() => {
-  //   setSummaries(() => JSON.parse(localStorage.getItem("summaries")) || [])
-  // }, [])
+  useEffect(() => {
+    setSummary(findCurrentSummary())
+  }, [currentSummaryId])
+
 
   function createSummary(videoDetails, summaryText) {
+    const id = nanoid()
     const newSummary = {
-      id: nanoid(),
+      id: id,
       title: videoDetails.title,
-      creator: videoDetails.title,
+      creator: videoDetails.creator,
       text: summaryText,
       date: "",
       time: ""
     }
     setSummary(newSummary)
+    setCurrentSummaryId(id)
     setSummaries([newSummary, ...summaries])
   }
 
@@ -78,7 +80,6 @@ export default function App() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    console.log(url); 
     await sendURL();
   }
 
@@ -104,12 +105,11 @@ export default function App() {
     setSidebarToggled(true)
   }
 
-  // function getSummaryTitles() {
-  //   console.log(summaries)
-  //   const titles = summaries.map( summary => summary.title)
-  //   return titles
-  //   //console.log(titles)
-  // }
+  function findCurrentSummary() {
+    return summaries.find(summary => {
+        return summary.id === currentSummaryId
+    }) || summaries[0]
+}
 
   return (
     <div className="app-container">
@@ -131,8 +131,8 @@ export default function App() {
       <Sidebar
         sidebarRef={sidebarRef}
         sidebarToggled={sidebarToggled}
-        // titles={getSummaryTitles()}
         summaries={summaries}
+        setCurrentSummaryId={setCurrentSummaryId}
       />
       <main>
         <div className="app">
@@ -149,19 +149,11 @@ export default function App() {
               <button className="submit-url" type="submit">Search</button>
             </form>
           </div>
-          <div className="info">
-            {/* {summary.title && (
-              <div id="info">
-                
-              </div>
-            )} */}
-
-            
-              {summary.text && 
-                <Summary 
-                  summary={summary}
-                />
-            
+          <div className="summary-details">
+            {summary.text && 
+              <Summary 
+                summary={summary}
+              />
             }
           </div>
         </div>

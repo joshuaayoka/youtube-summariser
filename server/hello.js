@@ -1,2 +1,7 @@
-let arr = []
-arr.length > 0 && console.log("Hello")
+const string = ""
+if (string) {
+    console.log("yeah")
+}
+else {
+    console.log("no")
+}

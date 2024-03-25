@@ -13,6 +13,11 @@ export default function Sidebar(props) {
                     onClick={() => props.setCurrentSummaryId(id)}
                     >
                         {summary.title}
+                        <br></br>
+                        <br></br>
+                        Date: {summary.date}
+                        <br></br>
+                        Time: {summary.time}
                 </button>
             )
             })

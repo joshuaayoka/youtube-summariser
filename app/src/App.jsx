@@ -1,31 +1,32 @@
 // Import useState and useEffect
-import { useEffect, useState, useRef } from "react";
-import Summary from "./components/Summary";
-import Button from "./components/Button";
-import Sidebar from "./components/Sidebar";
-import "./App.css";
-import { nanoid } from "nanoid";
+import { useEffect, useState, useRef } from "react"
+import Summary from "./components/Summary"
+import Button from "./components/Button"
+import Sidebar from "./components/Sidebar"
+import "./App.css"
+import { nanoid } from "nanoid"
 
 export default function App() {
-  const [url, setUrl] = useState("");
-  const [transcript, setTranscript] = useState("");
+  const [url, setUrl] = useState("")
+  const [transcript, setTranscript] = useState("")
   const [summary, setSummary] = useState({
      id: "",
      title: "", 
      text: "",
      date: "",
      time: ""
-  });
-  const [sidebarToggled, setSidebarToggled] = useState(false);
+  })
+  const [sidebarToggled, setSidebarToggled] = useState(false)
   const [summaries, setSummaries] = useState(() => JSON.parse(localStorage.getItem("summaries")) || [])
   const [currentSummaryId, setCurrentSummaryId] = useState(
     (summaries[0] && summaries[0].id) || ""
   )
-  console.log(currentSummaryId)
-
+  
+  console.log(summary)
 
   // for clicking off sidebar
-  const sidebarRef = useRef(null);
+
+  const sidebarRef = useRef(null)
 
   useEffect(() => {
     function handler(e) {
@@ -38,7 +39,7 @@ export default function App() {
       }
     }
 
-    document.addEventListener("click", handler);
+    document.addEventListener("click", handler)
 
     return () => {
       document.removeEventListener("click", handler)
@@ -54,48 +55,61 @@ export default function App() {
   // for changing summary
 
   useEffect(() => {
-    setSummary(findCurrentSummary())
+    if (currentSummaryId) 
+      setSummary(findCurrentSummary())
   }, [currentSummaryId])
 
 
   function createSummary(videoDetails, summaryText) {
     const id = nanoid()
+    const datetime = getCurrentDateTime()
     const newSummary = {
       id: id,
       title: videoDetails.title,
       creator: videoDetails.creator,
       text: summaryText,
-      date: "",
-      time: ""
+      date: datetime.date,
+      time: datetime.time
     }
     setSummary(newSummary)
     setCurrentSummaryId(id)
     setSummaries([newSummary, ...summaries])
   }
 
+  function getCurrentDateTime() {
+    const currentDate = new Date()
+    
+    const formattedDate = currentDate.toLocaleDateString()
+    const formattedTime = currentDate.toLocaleTimeString()
+  
+    return {
+      date: formattedDate,
+      time: formattedTime
+    }
+  }  
+
   function handleChange(event) {
-    const { value } = event.target;
-    setUrl(value);
+    const { value } = event.target
+    setUrl(value)
   }
 
   async function handleSubmit(event) {
-    event.preventDefault();
-    await sendURL();
+    event.preventDefault()
+    await sendURL()
   }
 
   async function sendURL() {
     try {
-      const response = await fetch(`http://localhost:4000/transcript?url=${encodeURIComponent(url)}`);
+      const response = await fetch(`http://localhost:4000/transcript?url=${encodeURIComponent(url)}`)
       if (!response.ok) {
-        throw new Error(`Request failed with status: ${response.status}`);
+        throw new Error(`Request failed with status: ${response.status}`)
       }
 
-      const data = await response.json();
-      setTranscript(data.regularText);
+      const data = await response.json()
+      setTranscript(data.regularText)
       createSummary({ title: data.title, creator: data.creator }, data.promptOutput)
     } catch (error) {
-      console.error("Error sending URL:", error);
-      // Handle error, e.g., display an error message to the user
+      console.error("Error sending URL:", error)
     }
   }
 
@@ -159,5 +173,5 @@ export default function App() {
         </div>
       </main>
     </div>
-  );
+  )
 }

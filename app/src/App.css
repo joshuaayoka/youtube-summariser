@@ -4,7 +4,7 @@ main {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 20px 50px;
+    margin: 100px 50px;
     font-family: 'Courier New', Courier, monospace;
 }
 
@@ -17,16 +17,21 @@ main {
     display: flex;
     align-items: center;
     height: 70px;
+    position: fixed;
+    top: 0
 }
 
 .nav-items {
     margin: 0 20px;
     padding: 10px;
+    display: flex;
+    width: 100%;
 }
 
 .header {
     display: flex;
-    margin-top: 20px;
+    width: 100%;
+    /* margin-top: 20px; */
 }
 
 .app {
@@ -110,8 +115,15 @@ main {
     padding: 10px;
 }
 
+.invalid-url {
+    margin-top : 10px;
+    color: aliceblue;
+    text-align: center;
+}
+
 aside {
-    background-color: aliceblue;
+    /* background-color: aliceblue; */
+    background-color: rgb(18, 23, 28);
     position: fixed;
     width: 150px;
     top: 70px;
@@ -129,11 +141,29 @@ aside.visible {
 #info {
     border: 1px solid rgb(1, 1, 51);
     border-radius: 3px;
-    margin: 20px 0;
+    margin: 15px 0;
     background-color: rgb(37, 50, 61);
     color: aliceblue;
 }
 
 #info > * {
     padding: 0 10px
+}
+
+#select-summary {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    border: solid rgb(187, 187, 187);
+    margin-bottom: 30px;
+    cursor: pointer;
+    background-color: rgb(235, 235, 235);
+    color: rgb(0, 0, 0);
+}
+
+#select-summary:hover {
+    background-color: rgb(188, 188, 188);
+}
+
+#datetime {
+    color: rgb(113, 113, 113);
 }

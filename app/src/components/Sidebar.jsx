@@ -1,3 +1,5 @@
+import Button from "./Button";
+
 export default function Sidebar(props) {
   
     // Check if props.summaries is not empty
@@ -8,17 +10,25 @@ export default function Sidebar(props) {
         ? props.summaries.map((summary) => {
             const id = summary.id
             return (
-                <button 
+                <div 
                     key={`btn${id}`}
                     onClick={() => props.setCurrentSummaryId(id)}
+                    id="select-summary"
                     >
-                        {summary.title}
+                        <strong>{summary.title}</strong>
                         <br></br>
                         <br></br>
-                        Date: {summary.date}
+                        <span id="datetime"><strong>Date:</strong> {summary.date}</span>
                         <br></br>
-                        Time: {summary.time}
-                </button>
+                        <span id="datetime"><strong>Time:</strong> {summary.time}</span>
+
+                        <Button 
+                            className="delete-summary"
+                            handleClick={(event) => props.deleteSummary(event, id)}
+                            text="Del"
+                            type="delete"
+                        />
+                </div>
             )
             })
         : null

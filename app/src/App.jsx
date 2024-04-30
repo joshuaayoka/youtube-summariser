@@ -9,20 +9,13 @@ import { nanoid } from "nanoid"
 export default function App() {
   const [url, setUrl] = useState("")
   const [transcript, setTranscript] = useState("")
-  const [summary, setSummary] = useState({
-     id: "",
-     title: "", 
-     text: "",
-     date: "",
-     time: ""
-  })
+  // const [summary, setSummary] = useState(resetSummary)
   const [sidebarToggled, setSidebarToggled] = useState(false)
   const [summaries, setSummaries] = useState(() => JSON.parse(localStorage.getItem("summaries")) || [])
   const [currentSummaryId, setCurrentSummaryId] = useState(
     (summaries[0] && summaries[0].id) || ""
   )
-  
-  console.log(summary)
+  const [urlError, setUrlError] = useState("")
 
   // for clicking off sidebar
 
@@ -52,13 +45,6 @@ export default function App() {
     localStorage.setItem("summaries", JSON.stringify(summaries))
   }, [summaries])
 
-  // for changing summary
-
-  useEffect(() => {
-    if (currentSummaryId) 
-      setSummary(findCurrentSummary())
-  }, [currentSummaryId])
-
 
   function createSummary(videoDetails, summaryText) {
     const id = nanoid()
@@ -71,9 +57,8 @@ export default function App() {
       date: datetime.date,
       time: datetime.time
     }
-    setSummary(newSummary)
-    setCurrentSummaryId(id)
     setSummaries([newSummary, ...summaries])
+    setCurrentSummaryId(id)
   }
 
   function getCurrentDateTime() {
@@ -109,7 +94,8 @@ export default function App() {
       setTranscript(data.regularText)
       createSummary({ title: data.title, creator: data.creator }, data.promptOutput)
     } catch (error) {
-      console.error("Error sending URL:", error)
+      console.log("Error sending URL:", error)
+      // setUrlError("Invalid URL entry")
     }
   }
 
@@ -123,7 +109,17 @@ export default function App() {
     return summaries.find(summary => {
         return summary.id === currentSummaryId
     }) || summaries[0]
-}
+  }
+
+  function deleteSummary(event, id) {
+    event.stopPropagation()
+    setSummaries(oldSummaries => oldSummaries.filter(summaryToDelete => summaryToDelete.id !== id))
+
+    if (currentSummaryId == id) {
+      summaries.length > 0 ? setCurrentSummaryId(summaries[0].id) : setCurrentSummaryId("") 
+    }
+  }
+
 
   return (
     <div className="app-container">
@@ -134,19 +130,20 @@ export default function App() {
             text="Prev"
             handleClick={handleSidebarClick}
           />
+          <header className="header">
+            <h1 className="app-heading">
+              <span className="heading1">YT </span>
+              <span className="heading2">Summariser</span>
+            </h1>
+          </header>
         </div>
       </nav>
-      <header className="header">
-        <h1 className="app-heading">
-          <span className="heading1">YT </span>
-          <span className="heading2">Summariser</span>
-        </h1>
-      </header>
       <Sidebar
         sidebarRef={sidebarRef}
         sidebarToggled={sidebarToggled}
         summaries={summaries}
         setCurrentSummaryId={setCurrentSummaryId}
+        deleteSummary={deleteSummary}
       />
       <main>
         <div className="app">
@@ -163,10 +160,13 @@ export default function App() {
               <button className="submit-url" type="submit">Search</button>
             </form>
           </div>
+          {/* <div className="invalid-url">
+            {urlError && <p>{urlError}</p>}
+          </div> */}
           <div className="summary-details">
-            {summary.text && 
+            {summaries.length > 0 && 
               <Summary 
-                summary={summary}
+                summary={findCurrentSummary()}
               />
             }
           </div>

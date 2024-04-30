@@ -1,11 +1,10 @@
 import { useState, useId } from "react"
 
 export default function Summary(props) {
-    const [summaryArray, setSummaryArray] = useState(props.summary.text)
-
     const id = useId()
+    console.log(props.summary)
     
-    const summaryElements = summaryArray.map(text => {
+    const summaryElements = props.summary.text.map(text => {
         return (
             <div key={id + text.subtitle.charAt(0)}>
                 <h3>{text.subtitle}</h3>
@@ -24,6 +23,10 @@ export default function Summary(props) {
                 <h2>Summary</h2>
                 {summaryElements}
             </div>
+            {/* <Button
+                className="delete-summary"
+                onClick={props.deleteSummary}
+            /> */}
         </div>
     )
 }

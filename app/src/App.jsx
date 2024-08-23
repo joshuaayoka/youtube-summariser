@@ -120,6 +120,21 @@ export default function App() {
     }
   }
 
+  function handleDownload(summaryData, summaryName) {
+    const blob = new Blob([summaryData], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', summaryName)
+
+    document.body.appendChild(link)
+    link.click()
+
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
 
   return (
     <div className="app-container">
@@ -160,15 +175,15 @@ export default function App() {
               <button className="submit-url" type="submit">Search</button>
             </form>
           </div>
-          {/* <div className="invalid-url">
-            {urlError && <p>{urlError}</p>}
-          </div> */}
-          <div className="summary-details">
-            {summaries.length > 0 && 
-              <Summary 
-                summary={findCurrentSummary()}
-              />
-            }
+          <div>
+            <div>
+              {summaries.length > 0 && 
+                <Summary 
+                  summary={findCurrentSummary()}
+                  handleDownload={handleDownload}
+                />
+              }
+            </div>            
           </div>
         </div>
       </main>

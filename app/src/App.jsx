@@ -6,6 +6,12 @@ import Sidebar from "./components/Sidebar"
 import "./App.css"
 import { nanoid } from "nanoid"
 
+// Enum
+const Mode = Object.freeze({
+  YOUTUBE: "youtube",
+  DOCUMENT: "document",
+})
+
 export default function App() {
   const [url, setUrl] = useState("")
   const [transcript, setTranscript] = useState("")
@@ -16,9 +22,11 @@ export default function App() {
     (summaries[0] && summaries[0].id) || ""
   )
   const [urlError, setUrlError] = useState("")
+  const [mode, setMode] = useState(Mode.YOUTUBE)
+
+  const [uploadedFile, setUploadedFile] = useState(null)
 
   // for clicking off sidebar
-
   const sidebarRef = useRef(null)
 
   useEffect(() => {
@@ -135,6 +143,40 @@ export default function App() {
     URL.revokeObjectURL(url)
   }
 
+  function switchMode(newMode) {
+    if (Object.values(Mode).includes(newMode)) {
+      setMode(newMode);
+    } else {
+      console.error("Invalid mode:", newMode);
+    }
+  }
+
+  function handleDocumentUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+      setUploadedFile(file);
+
+      // If you need to read the file content, you can use FileReader
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target.result;
+        console.log("File content:", content);
+      };
+      reader.readAsArrayBuffer(file); 
+    }
+  }
+
+
+  function handleDocumentSubmit(event) {
+    event.preventDefault();
+
+    if (uploadedFile) {
+      console.log("Submitting the uploaded file:", uploadedFile);
+      // Implement your file submission logic here (e.g., send it to a server)
+    } else {
+      console.log("No file uploaded");
+    }
+  }
 
   return (
     <div className="app-container">
@@ -162,19 +204,56 @@ export default function App() {
       />
       <main>
         <div className="app">
-          <div className="url-entry">
-            <form 
-              onSubmit={handleSubmit} 
-              className="url-form"
-            >
-              <input
-                className="input-url"
-                placeholder="Enter URL"
-                onChange={handleChange}
-              />
-              <button className="submit-url" type="submit">Search</button>
-            </form>
+          <div>
+            <Button 
+              className="youtube"
+              text="Youtube"
+              handleClick={() => setMode(Mode.YOUTUBE)}
+            />
+            <Button 
+              className="document"
+              text="Document"
+              handleClick={() => setMode(Mode.DOCUMENT)}
+            />
           </div>
+          {mode === Mode.YOUTUBE && (
+            <div className="url-entry">
+              <form 
+                onSubmit={handleSubmit} 
+                className="url-form"
+              >
+                <input
+                  className="input-url"
+                  placeholder="Enter URL"
+                  onChange={handleChange}
+                />
+                <button className="submit-url" type="submit">Search</button>
+              </form>
+            </div>
+          )}
+          {mode === Mode.DOCUMENT && (
+              <div className="document-upload">
+                <form 
+                  onSubmit={handleDocumentSubmit} 
+                  className="document-form"
+                >
+                </form>
+                <div className="upload-button">
+                  <label className="upload-label">
+                    Upload Document
+                    <input 
+                      type="file" 
+                      accept=".pdf,.doc,.docx,.txt" 
+                      onChange={handleDocumentUpload} 
+                      className="file-input" 
+                    />
+                  </label>
+                  {uploadedFile && (
+                    <p className="file-name">Selected file: {uploadedFile.name}</p>
+                  )}
+                </div>
+              </div>
+            )}
           <div>
             <div>
               {summaries.length > 0 && 

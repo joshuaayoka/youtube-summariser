@@ -57,13 +57,16 @@ export default function App() {
   function createSummary(videoDetails, summaryText) {
     const id = nanoid()
     const datetime = getCurrentDateTime()
+    const videoId = getYouTubeVideoId(url)
+
     const newSummary = {
       id: id,
       title: videoDetails.title,
       creator: videoDetails.creator,
       text: summaryText,
       date: datetime.date,
-      time: datetime.time
+      time: datetime.time,
+      videoId: videoId,
     }
     setSummaries([newSummary, ...summaries])
     setCurrentSummaryId(id)
@@ -166,6 +169,17 @@ export default function App() {
     }
   }
 
+  function getYouTubeVideoId(url) {
+    const regExp = /^.*(youtu.be\/|v\/|\/u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+  
+    if (match && match[2].length === 11) {
+      return match[2];
+    } else {
+      return null; // Invalid or no YouTube video ID found
+    }
+  }
+  
 
   function handleDocumentSubmit(event) {
     event.preventDefault();

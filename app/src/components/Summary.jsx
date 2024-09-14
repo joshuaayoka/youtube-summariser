@@ -3,6 +3,8 @@ import Button from "./Button"
 
 export default function Summary(props) {
     const id = useId()
+    const videoId = props.summary.videoId
+
     console.log(props.summary)
     
     const summaryElements = props.summary.text.map(text => {
@@ -25,9 +27,22 @@ export default function Summary(props) {
 
     return (
         <div>
-            <div id="info" className="video-details">
-                <p className="video-title">Video: {props.summary.title}</p>
-                <p>Creator: {props.summary.creator}</p>
+            <div className="video-container">
+                {/* Video details on the left (or top on smaller screens) */}
+                <div className="video-details">
+                    <p className="video-title">Video: {props.summary.title}</p>
+                    <p>Creator: {props.summary.creator}</p>
+                </div>
+                
+                {/* Video iframe on the right (or below on smaller screens) */}
+                <div className="video-embed">
+                    <iframe
+                        src={`https://www.youtube.com/embed/${videoId}`}
+                        title={props.summary.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                    ></iframe>
+                </div>
             </div>
             <div id="info" className="summary-details">
                 <div>

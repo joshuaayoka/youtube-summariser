@@ -21,7 +21,6 @@ export default function App() {
   const [currentSummaryId, setCurrentSummaryId] = useState(
     (summaries[0] && summaries[0].id) || ""
   )
-  const [urlError, setUrlError] = useState("")
   const [mode, setMode] = useState(Mode.YOUTUBE)
 
   const [uploadedFile, setUploadedFile] = useState(null)

@@ -65,11 +65,6 @@ main {
 
 }
 
-/* .url-entry {
-    background-color: green;
-    max-width: 100%;
-} */
-
 .url-form {
     display: flex;
     justify-content: center;

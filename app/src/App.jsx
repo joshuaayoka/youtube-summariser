@@ -70,7 +70,8 @@ export default function App() {
     setSummaries([newSummary, ...summaries])
     setCurrentSummaryId(id)
   }
-
+  
+  // gets the current date and time and returns as object literal
   function getCurrentDateTime() {
     const currentDate = new Date()
     
@@ -93,6 +94,9 @@ export default function App() {
     await sendURL()
   }
 
+  /*
+   * Sends the url that the user inputted to the server to obtain data and return back to client side 
+   */
   async function sendURL() {
     try {
       const response = await fetch(`http://localhost:4000/transcript?url=${encodeURIComponent(url)}`)
@@ -105,7 +109,6 @@ export default function App() {
       createSummary({ title: data.title, creator: data.creator }, data.promptOutput)
     } catch (error) {
       console.log("Error sending URL:", error)
-      // setUrlError("Invalid URL entry")
     }
   }
 

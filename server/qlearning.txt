@@ -1,8 +1,0 @@
-Q Learning
- Initialise random Q Value table, update iteratively using experiences gathered by agent
-
-Bellman formula: 𝑄(𝑠,𝑎)←𝑄(𝑠,𝑎)+𝛼[𝑟+𝛾max𝑎′𝑄(𝑠′,𝑎′)−𝑄(𝑠,𝑎)]
-Policy determines which action to take in each state and can be derived from Q-values. Exploitation: policy chooses action which highest Q-value. Exploration: sometimes less optimal action is chosen for exploration purposes.
-Epsilon-greedy strategy: agent mostly chooses best-known action but occasionally tries random action.
-
-Discount Factor (γ): This factor discounts the value of future rewards compared to immediate rewards. A higher discount factor means that future rewards are more valuable, encouraging long-term beneficial actions over short-term gains.

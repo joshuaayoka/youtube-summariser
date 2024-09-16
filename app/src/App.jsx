@@ -70,6 +70,21 @@ export default function App() {
     setSummaries([newSummary, ...summaries])
     setCurrentSummaryId(id)
   }
+
+  function createDocumentSummary(summaryText) {
+    const id = nanoid()
+    const datetime = getCurrentDateTime()
+
+    const newSummary = {
+      id: id,
+      // title: ,
+      text: summaryText,
+      date: datetime.date,
+      time: datetime.time,
+    }
+    setSummaries([newSummary, ...summaries])
+    setCurrentSummaryId(id)
+  }
   
   // gets the current date and time and returns as object literal
   function getCurrentDateTime() {
@@ -162,12 +177,12 @@ export default function App() {
       setUploadedFile(file);
 
       // If you need to read the file content, you can use FileReader
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target.result;
-        console.log("File content:", content);
-      };
-      reader.readAsArrayBuffer(file); 
+      // const reader = new FileReader();
+      // reader.onload = (e) => {
+      //   const content = e.target.result;
+      //   console.log("File content:", content);
+      // };
+      // reader.readAsArrayBuffer(file); 
     }
   }
 
@@ -183,16 +198,45 @@ export default function App() {
   }
   
 
-  function handleDocumentSubmit(event) {
-    event.preventDefault();
+  // function handleDocumentSubmit(event) {
+  //   event.preventDefault();
 
+  //   if (uploadedFile) {
+  //     console.log("Submitting the uploaded file:", uploadedFile);
+  //     // Implement your file submission logic here (e.g., send it to a server)
+  //   } else {
+  //     console.log("No file uploaded");
+  //   }
+  // }
+  async function handleDocumentSubmit(event) {
+    event.preventDefault();
+  
     if (uploadedFile) {
-      console.log("Submitting the uploaded file:", uploadedFile);
-      // Implement your file submission logic here (e.g., send it to a server)
+      const formData = new FormData();
+      formData.append("file", uploadedFile);
+  
+      try {
+        const response = await fetch("http://localhost:4000/upload-document", {
+          method: "POST",
+          body: formData,
+        });
+  
+        if (!response.ok) {
+          throw new Error(`Error uploading file: ${response.statusText}`);
+        }
+  
+        const data = await response.json();
+        console.log("Extracted text:", data.extractedText);
+        createDocumentSummary(data.promptOutput);
+        // You can now use `data.extractedText` for further processing, like creating a summary
+      } catch (error) {
+        console.error("Error submitting document:", error);
+      }
     } else {
       console.log("No file uploaded");
     }
   }
+  
 
   return (
     <div className="app-container">
@@ -253,15 +297,18 @@ export default function App() {
                   onSubmit={handleDocumentSubmit} 
                   className="document-form"
                 >
+                  {/* <button className="document-submit" type="submit">Generate summary</button> */}
+                  <Button className="document-submit" text="Generate summary" />
                 </form>
                 <div className="upload-button">
                   <label className="upload-label">
-                    Upload Document
+                    {/* Upload Document */}
+                    
                     <input 
                       type="file" 
                       accept=".pdf,.doc,.docx,.txt" 
                       onChange={handleDocumentUpload} 
-                      className="file-input" 
+                      className="file-input"
                     />
                   </label>
                   {uploadedFile && (

@@ -1,6 +1,7 @@
 import { useState, useId } from "react"
 import Button from "./Button"
 
+
 export default function Summary(props) {
     const id = useId()
     const videoId = props.summary.videoId
@@ -27,6 +28,7 @@ export default function Summary(props) {
 
     return (
         <div>
+            {props.summary.type === "youtube" &&
             <div className="video-container">
                 {/* Video details on the left (or top on smaller screens) */}
                 <div className="video-details">
@@ -44,6 +46,7 @@ export default function Summary(props) {
                     ></iframe>
                 </div>
             </div>
+            }
             <div id="info" className="summary-details">
                 <div>
                     <h2>Summary</h2>

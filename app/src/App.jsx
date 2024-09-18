@@ -1,7 +1,6 @@
 // Import useState and useEffect
 import { useEffect, useState, useRef } from "react"
 import Summary from "./components/Summary"
-import Button from "./components/Button"
 import Sidebar from "./components/Sidebar"
 import "./App.css"
 import { nanoid } from "nanoid"
@@ -15,7 +14,6 @@ const Mode = Object.freeze({
 export default function App() {
   const [url, setUrl] = useState("")
   const [transcript, setTranscript] = useState("")
-  // const [summary, setSummary] = useState(resetSummary)
   const [sidebarToggled, setSidebarToggled] = useState(false)
   const [summaries, setSummaries] = useState(() => JSON.parse(localStorage.getItem("summaries")) || [])
   const [currentSummaryId, setCurrentSummaryId] = useState(
@@ -59,6 +57,7 @@ export default function App() {
     const videoId = getYouTubeVideoId(url)
 
     const newSummary = {
+      type: Mode.YOUTUBE,
       id: id,
       title: videoDetails.title,
       creator: videoDetails.creator,
@@ -76,8 +75,8 @@ export default function App() {
     const datetime = getCurrentDateTime()
 
     const newSummary = {
+      type: Mode.DOCUMENT,
       id: id,
-      // title: ,
       text: summaryText,
       date: datetime.date,
       time: datetime.time,
@@ -175,14 +174,6 @@ export default function App() {
     const file = event.target.files[0];
     if (file) {
       setUploadedFile(file);
-
-      // If you need to read the file content, you can use FileReader
-      // const reader = new FileReader();
-      // reader.onload = (e) => {
-      //   const content = e.target.result;
-      //   console.log("File content:", content);
-      // };
-      // reader.readAsArrayBuffer(file); 
     }
   }
 
@@ -196,18 +187,7 @@ export default function App() {
       return null; // Invalid or no YouTube video ID found
     }
   }
-  
 
-  // function handleDocumentSubmit(event) {
-  //   event.preventDefault();
-
-  //   if (uploadedFile) {
-  //     console.log("Submitting the uploaded file:", uploadedFile);
-  //     // Implement your file submission logic here (e.g., send it to a server)
-  //   } else {
-  //     console.log("No file uploaded");
-  //   }
-  // }
   async function handleDocumentSubmit(event) {
     event.preventDefault();
   
@@ -228,7 +208,6 @@ export default function App() {
         const data = await response.json();
         console.log("Extracted text:", data.extractedText);
         createDocumentSummary(data.promptOutput);
-        // You can now use `data.extractedText` for further processing, like creating a summary
       } catch (error) {
         console.error("Error submitting document:", error);
       }
@@ -242,11 +221,13 @@ export default function App() {
     <div className="app-container">
       <nav className="nav">
         <div className="nav-items">
-          <Button
+          <button 
+            id="button"
             className="sidebar-toggle"
-            text="Prev"
-            handleClick={handleSidebarClick}
-          />
+            onClick={handleSidebarClick}
+          >
+            Prev
+          </button>
           <header className="header">
             <h1 className="app-heading">
               <span className="heading1">YT </span>
@@ -264,17 +245,21 @@ export default function App() {
       />
       <main>
         <div className="app">
-          <div>
-            <Button 
+          <div className="mode-selection">
+            <button 
+              id="button"
               className="youtube"
-              text="Youtube"
-              handleClick={() => setMode(Mode.YOUTUBE)}
-            />
-            <Button 
+              onClick={() => setMode(Mode.YOUTUBE)}
+            >
+              Youtube
+            </button>
+            <button 
+              id="button"
               className="document"
-              text="Document"
-              handleClick={() => setMode(Mode.DOCUMENT)}
-            />
+              onClick={() => setMode(Mode.DOCUMENT)}
+            >
+              Document
+            </button>
           </div>
           {mode === Mode.YOUTUBE && (
             <div className="url-entry">
@@ -287,24 +272,17 @@ export default function App() {
                   placeholder="Enter URL"
                   onChange={handleChange}
                 />
-                <button className="submit-url" type="submit">Search</button>
+                <button id="button" className="submit-url" type="submit">
+                  Search
+                </button>
               </form>
             </div>
           )}
           {mode === Mode.DOCUMENT && (
               <div className="document-upload">
-                <form 
-                  onSubmit={handleDocumentSubmit} 
-                  className="document-form"
-                >
-                  {/* <button className="document-submit" type="submit">Generate summary</button> */}
-                  <Button className="document-submit" text="Generate summary" />
-                </form>
                 <div className="upload-button">
                   <label className="upload-label">
-                    {/* Upload Document */}
-                    
-                    <input 
+                    <input
                       type="file" 
                       accept=".pdf,.doc,.docx,.txt" 
                       onChange={handleDocumentUpload} 
@@ -315,6 +293,14 @@ export default function App() {
                     <p className="file-name">Selected file: {uploadedFile.name}</p>
                   )}
                 </div>
+                <form 
+                  onSubmit={handleDocumentSubmit} 
+                  className="document-form"
+                >
+                  <button id="button" className="document-submit" type="submit">
+                    Generate summary
+                  </button>
+                </form>
               </div>
             )}
           <div>

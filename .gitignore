@@ -33,3 +33,5 @@ app/dist/
 server/dist/
 app/*.log
 server/*.log
+
+server/hello.js

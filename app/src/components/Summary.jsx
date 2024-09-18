@@ -47,6 +47,13 @@ export default function Summary(props) {
                 </div>
             </div>
             }
+            {props.summary.type === "document" &&
+            <div>
+                <div className="video-details">
+                    <p className="video-title">Title: {props.summary.title}</p>
+                </div>
+            </div>
+            }
             <div id="info" className="summary-details">
                 <div>
                     <h2>Summary</h2>

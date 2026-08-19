@@ -35,3 +35,5 @@ app/*.log
 server/*.log
 
 server/hello.js
+
+practice/

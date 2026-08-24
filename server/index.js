@@ -2,18 +2,21 @@
 
 const express = require('express');
 const cors = require('cors');
-const ytt = require('youtube-transcript');
-const ytdl = require('ytdl-core');
+const { fetchTranscript } = require('youtube-transcript-plus');
+const { Innertube } = require('youtubei.js');
 const openAI = require("openai");
 const fs = require("fs");
 const multer = require('multer'); // For handling file uploads
 const mammoth = require('mammoth'); // For extracting text from .docx files
 const pdfParse = require('pdf-parse'); // For extracting text from PDFs
+const path = require('path');
+const dotenv = require('dotenv').config({ path: path.join(__dirname, '.env.local') });
+
 
 const app = express();
 const port = 4000; // or any port of your choice
 
-const openai = new openAI.OpenAI({apiKey: process.env.OPENAI_API_KEY})
+const openai = new openAI.OpenAI();
 
 app.use(cors());
 
@@ -23,6 +26,23 @@ const upload = multer({ dest: 'uploads/' }); // Files are temporarily stored in 
 // Function to convert transcript into regular text
 function convertToRegularText(transcript) {
   return transcript.map((item) => item.text).join(' ');
+}
+
+// Lazily-initialized, cached Innertube client (used for video metadata only)
+let innertubePromise;
+function getInnertube() {
+  if (!innertubePromise) {
+    innertubePromise = Innertube.create({ lang: 'en', location: 'US', retrieve_player: false });
+  }
+  return innertubePromise;
+}
+
+// Extract the 11-character YouTube video ID from a URL, or pass through a bare ID
+function extractVideoId(input) {
+  const match = input.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|v\/))([\w-]{11})/);
+  if (match) return match[1];
+  if (/^[\w-]{11}$/.test(input)) return input;
+  return null;
 }
 
 function extractMessageContent(output) {
@@ -51,20 +71,21 @@ function extractSubtitlesAndContent(output) {
 }
 
 async function runPrompt(task, transcriptContent) {
-  const prompt = task.concat(transcriptContent)
+  const MAX_LENGTH = 15000;
+  const truncatedContent = transcriptContent.substring(0, MAX_LENGTH);
+  const prompt = task.concat(truncatedContent);
 
   const completion = await openai.chat.completions.create({
       messages: [{
         role: "system",
         content: prompt
       }],
-      model: "gpt-3.5-turbo",
+      model: "gpt-4.1-nano",
     });
 
-  //const message = extractMessageContent(completion.choices)
-  const arr = extractSubtitlesAndContent(completion.choices)
+  const arr = extractSubtitlesAndContent(completion.choices);
 
-  return arr
+  return arr;
 }
 
 // Define a route to handle transcript retrieval
@@ -72,13 +93,19 @@ app.get('/transcript', async (req, res) => {
   try {
     const videoUrl = req.query.url; // Assuming the URL is passed as a query parameter
 
-    // Fetch the transcript
-    const transcript = await ytt.YoutubeTranscript.fetchTranscript(videoUrl);
+    const videoId = extractVideoId(videoUrl);
+    if (!videoId) {
+      return res.status(400).json({ error: 'Could not parse a YouTube video ID from that URL' });
+    }
 
-    // Fetch video details using ytdl-core
-    const info = await ytdl.getInfo(videoUrl);
-    const title = info.videoDetails.title;
-    const creator = info.videoDetails.author.name;
+    // Fetch the transcript
+    const transcript = await fetchTranscript(videoId);
+
+    // Fetch video details
+    const yt = await getInnertube();
+    const info = await yt.getBasicInfo(videoId);
+    const title = info.basic_info.title;
+    const creator = info.basic_info.author;
 
     // Convert the transcript into regular text
     const regularText = convertToRegularText(transcript);
@@ -136,6 +163,7 @@ app.post('/upload-document', upload.single('file'), async (req, res) => {
       } else if (fileExtension === 'txt') {
           extractedText = await extractTextFromTxt(file.path);
       } else {
+          fs.unlinkSync(file.path);
           return res.status(400).json({ error: 'Unsupported file format' });
       }
 
@@ -149,6 +177,10 @@ app.post('/upload-document', upload.single('file'), async (req, res) => {
       res.json({ extractedText, promptOutput });
   } catch (error) {
       console.error('Error processing document:', error);
+      // Clean up the temp file if it's still on disk (e.g. extraction failed)
+      if (req.file && fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+      }
       res.status(500).json({ error: 'Internal Server Error' });
   }
 });
